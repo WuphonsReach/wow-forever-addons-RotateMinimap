@@ -2,7 +2,7 @@
 -- instead of erroring in the client.
 std = "lua51"
 max_line_length = false
-exclude_files = { ".luacheckrc", ".luarocks", "dist" }
+exclude_files = { ".luacheckrc", ".luarocks", "dist", "local" }
 
 read_globals = {
   "CreateFrame",

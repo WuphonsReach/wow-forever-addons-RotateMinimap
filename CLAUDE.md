@@ -4,7 +4,7 @@ This file gives guidance to Claude Code (claude.ai/code) for work in this reposi
 
 ## What this is
 
-A one-file addon for WoW Forever (client 1.60.1, `## Interface: 16001`). At login and after every loading screen, it sets the game's `rotateMinimap` setting (a console variable, or CVar) to on. The Forever client drops the setting at login. The description for players is in [README.md](README.md).
+A one-file addon for WoW Forever (client 1.60.1, `## Interface: 16001`). It keeps the game's `rotateMinimap` setting (a console variable, or CVar) on. The Forever client resets the setting to 0 at login, just after `VARIABLES_LOADED`. The description for players is in [README.md](README.md).
 
 - The display name is Rotate Minimap (Forever). It is the `.toc` `## Title`, the README heading, and the CurseForge project title in the future.
 - The folder, the `.toc` file and the code keep the name `RotateMinimap`.
@@ -23,7 +23,9 @@ The addon's files are at the repo root, which is usual for a small repo with one
 - [RotateMinimap.toc](RotateMinimap.toc): the metadata and the file list.
   - `## Interface: 16001` is Forever 1.60.1. When the client's interface number changes, update it here. If you do not, the addon shows as out of date.
   - `## Version` stays `@project-version@` in the repo. The release build writes the real number. This is the token of the BigWigs packager, so the packager can replace the build later with no changes.
-- [RotateMinimap.lua](RotateMinimap.lua): one frame listens for `PLAYER_LOGIN` and `PLAYER_ENTERING_WORLD`. It calls `SetCVar("rotateMinimap", ROTATE)` only when the value is different. It uses no SavedVariables and has no options UI. `ROTATE` is the only setting.
+- [RotateMinimap.lua](RotateMinimap.lua): one frame listens for `PLAYER_LOGIN`, `PLAYER_ENTERING_WORLD` and `CVAR_UPDATE` (for `rotateMinimap` only). It calls `SetCVar("rotateMinimap", ROTATE)` only when the value is different. It uses no SavedVariables and has no options UI. `ROTATE` is the only setting.
+  - `CVAR_UPDATE` does the real work. `VARIABLES_LOADED`, and the reset after it, can come after `PLAYER_LOGIN` and `PLAYER_ENTERING_WORLD`, for example after a character switch.
+  - To find out when the client changes a setting, log each event and the value to chat and to a SavedVariables table. Remove the logging before a release.
 - [version.yml](version.yml): the major and minor version of the next release. It has only `major: N` and `minor: N` lines.
 - [CHANGELOG.md](CHANGELOG.md): one `## <version>` section for each release, newest first. A `## Unreleased` section at the top holds changes that are not released yet. Every PR that changes the addon adds a line to it.
 - `tools/`: Python scripts with no dependencies.
@@ -33,6 +35,7 @@ The addon's files are at the repo root, which is usual for a small repo with one
   - [release_due.py](tools/release_due.py) tells if a release is due.
   - [build_zip.py](tools/build_zip.py) builds `dist/RotateMinimap-<version>.zip`.
   - [addon.py](tools/addon.py) holds the helpers that the other scripts share.
+- `local/`: a folder for local files, for example notes, logs and screenshots. Git ignores it, and luacheck skips it. Put files here that must not go into the public repo.
 
 If the addon needs more than one folder in the future (a second addon, or folders for development only), do these steps:
 
