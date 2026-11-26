@@ -6,6 +6,8 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 
 A one-file addon for WoW Forever (client 1.60.1, `## Interface: 16001`). It switches the game's `rotateMinimap` setting (a console variable, or CVar) on at login and after every loading screen, because the Forever client drops the setting at login. The player-facing description is [README.md](README.md).
 
+The display name is **Rotate Minimap (Forever)**: the `.toc` `## Title`, the README heading, and the CurseForge project title when it goes there. The folder, `.toc` file and code keep `RotateMinimap`. Only Forever is supported, on purpose: other WoW versions have a "Rotate Minimap" checkbox in their options, and Forever has none. Don't add `.toc` files for other versions.
+
 The repo is public on GitHub ([WuphonsReach/wow-forever-addons-RotateMinimap](https://github.com/WuphonsReach/wow-forever-addons-RotateMinimap), MIT). Releases are published on GitHub only, not on CurseForge yet. There is no build step and no unit tests. The client loads the `.lua` and `.toc` files as they are, and the user does every in-game test.
 
 ## Layout

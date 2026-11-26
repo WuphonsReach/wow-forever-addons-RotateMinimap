@@ -1,6 +1,8 @@
-# RotateMinimap
+# Rotate Minimap (Forever)
 
-A tiny addon for WoW Forever (client 1.60.1, `## Interface: 16001`) that switches the `rotateMinimap` game setting on at login and after loading screens, so the minimap turns with your facing.
+A tiny addon for WoW Forever (client 1.60.1, `## Interface: 16001`) that switches the `rotateMinimap` game setting on at login and after loading screens, so the minimap turns with your facing instead of keeping North at the top.
+
+It is for WoW Forever only. Other WoW versions have a "Rotate Minimap" checkbox in their interface options, so they don't need it. Forever has the setting but no checkbox for it.
 
 ## Why
 
