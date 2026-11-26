@@ -11,7 +11,7 @@ The game has a `rotateMinimap` setting, but the Forever client resets it at logi
 3. Close the game and start it again. The game finds a new addon folder only after a full restart, not after `/reload`.
 4. At character select, open the AddOn List and make sure that Rotate Minimap (Forever) is in the list and on.
 
-You can also install from the repo. Make a folder named `RotateMinimap` in `AddOns/`, and copy `RotateMinimap.toc` and `RotateMinimap.lua` into it.
+You can also install from the repo. Make a folder named `RotateMinimap` in `AddOns/`, and copy `RotateMinimap.toc` and `RotateMinimap.lua` into it. To change the addon and test it, see [docs/development.md](docs/development.md).
 
 ## Settings
 
