@@ -15,7 +15,7 @@ FIXED_TIME = (2026, 1, 1, 0, 0, 0)  # same bytes for the same content, whenever 
 
 def main():
     if len(sys.argv) != 2 or not re.fullmatch(r"[0-9]+\.[0-9]+\.[0-9]+(-[0-9A-Za-z.]+)?", sys.argv[1]):
-        sys.exit("usage: build_zip.py MAJOR.MINOR.PATCH")
+        sys.exit("usage: build_zip.py MAJOR.MINOR.PATCH[-SUFFIX]")
     version = sys.argv[1]
     _, files = read_toc()
 

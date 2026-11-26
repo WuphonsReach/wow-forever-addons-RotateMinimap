@@ -4,13 +4,13 @@ the files it lists match the .lua files in the repo root, and CHANGELOG.md's hea
 import re
 import sys
 
-from addon import (CHANGELOG, ROOT, TOC, UNRELEASED, VERSION_RE, VERSION_TOKEN, next_version, read_changelog,
-                   read_toc, read_version_file, version_tags)
+from addon import (CHANGELOG, ROOT, TOC, UNRELEASED, VERSION_RE, VERSION_TOKEN, changelog_at_tag, next_version,
+                   read_changelog, read_toc, read_version_file, version_tags)
 
 
 def check_changelog():
     """The top section is `Unreleased`, the next release's version, or the latest tag (just released);
-    the rest are released versions, newest first."""
+    the rest are released versions, newest first, unchanged since their tags."""
     if not CHANGELOG.is_file():
         return ["CHANGELOG.md is missing"]
     sections = read_changelog()
@@ -19,13 +19,13 @@ def check_changelog():
     try:
         upcoming = next_version()
     except ValueError:
-        return []  # version.yml is broken; reported above
+        upcoming = None  # version.yml is broken (reported above); still check the rest
     tags = sorted(version_tags())
     latest = ".".join(map(str, tags[-1])) if tags else None
     errors = []
     top = sections[0][0]
-    allowed = [UNRELEASED, upcoming] + ([latest] if latest else [])
-    if top not in allowed:
+    allowed = [UNRELEASED] + ([upcoming] if upcoming else []) + ([latest] if latest else [])
+    if upcoming and top not in allowed:
         errors.append(f"CHANGELOG.md: top section '## {top}' should be one of: "
                       + ", ".join(f"'## {a}'" for a in allowed))
     versions = []
@@ -37,7 +37,14 @@ def check_changelog():
             continue
         if not body:
             errors.append(f"CHANGELOG.md: '## {heading}' is empty")
-        versions.append(tuple(int(x) for x in heading.split(".")))
+        version = tuple(int(x) for x in heading.split("."))
+        versions.append(version)
+        # A released section must read as it did at its tag, so new entries can't land under an old version.
+        if version in tags:
+            then = changelog_at_tag(heading)
+            if then is not None and body != dict(read_changelog(then)).get(heading, body):
+                errors.append(f"CHANGELOG.md: '## {heading}' is already released and differs from its text at "
+                              f"tag v{heading}; put new entries under '## {UNRELEASED}'")
     if versions != sorted(set(versions), reverse=True):
         errors.append("CHANGELOG.md: versions should be unique and newest first")
     return errors
@@ -63,7 +70,7 @@ def main():
         if not (ROOT / name).is_file():
             errors.append(f"{TOC.name} lists {name}, which does not exist")
     for path in sorted(ROOT.glob("*.lua")):
-        if path.name != ".luacheckrc" and path.name not in files:
+        if path.name not in files:
             errors.append(f"{path.name} is not listed in {TOC.name}, so the client won't load it")
     if not (ROOT / "LICENSE").is_file():
         errors.append("LICENSE is missing (it ships in the release zip)")

@@ -50,11 +50,22 @@ def next_version():
     return f"{major}.{minor}.{max(patches) + 1 if patches else 0}"
 
 
-def read_changelog():
-    """Return the CHANGELOG.md sections as a list of (heading, body), in file order."""
+def changelog_at_tag(version):
+    """CHANGELOG.md's text as of tag v<version>, or None if the tag or the file there doesn't exist."""
+    r = subprocess.run(["git", "show", f"v{version}:CHANGELOG.md"], cwd=ROOT, capture_output=True, text=True)
+    return r.stdout if r.returncode == 0 else None
+
+
+def read_changelog(text=None):
+    """Return the CHANGELOG.md sections (or those of `text`) as a list of (heading, body), in file order."""
+    if text is None:
+        text = CHANGELOG.read_text(encoding="utf-8")
     sections = []
-    for line in CHANGELOG.read_text(encoding="utf-8").splitlines():
-        if line.startswith("## "):
+    in_fence = False
+    for line in text.splitlines():
+        if line.lstrip().startswith("```"):
+            in_fence = not in_fence
+        if line.startswith("## ") and not in_fence:
             sections.append((line[3:].strip(), []))
         elif sections:
             sections[-1][1].append(line)

@@ -43,7 +43,8 @@ Actions are pinned to full commit SHAs, with the version in a trailing comment, 
 [.github/workflows/release.yml](.github/workflows/release.yml) is started by hand from `main` (Actions > release > Run workflow, or `gh workflow run release.yml --ref main`). It runs the checks and computes the version: `major.minor` from `version.yml`, plus a patch number one past the highest `v<major>.<minor>.N` tag, or 0 if there is none. It then checks that CHANGELOG.md's top section is headed with that version, builds the zip, and creates the tag `v<version>` and the GitHub release together, with that CHANGELOG section as the notes.
 
 - To release: open a PR that renames `## Unreleased` to the version `python3 tools/next_version.py` prints (CI prints it too), merge it, then run the workflow. For a bigger change, bump `minor` (or `major`, with `minor` back to 0) in `version.yml` in the same PR.
-- `check_repo.py` accepts only `Unreleased`, the next version, or the latest tag (just released) as the top heading, so a wrong number fails on the PR, not at release time.
+- `check_repo.py` accepts only `Unreleased`, the next version, or the latest tag (just released) as the top heading, and fails when a released section differs from its text at its tag. A wrong number, or an entry filed under an old version, fails on the PR rather than at release time.
+- The workflow fails straight away when started from any branch other than `main`.
 - Tags (`version-tags` ruleset) and releases (the repo's immutable releases setting) can't be changed once published. A bad release means a new version, not a fix in place.
 - The release zip has the `RotateMinimap/` folder at its top level, holding the `.toc`, the files it lists, `LICENSE` and `CHANGELOG.md`. A wrapper folder would stop the addon loading.
 
@@ -72,4 +73,4 @@ Branch from `origin/main` as `<YYYY-MM-DD>-<slug>`. Commit, push or open a PR on
 
 ## Public repo
 
-This repo is public. Keep account names, character names, realm or server ids, home paths and machine details out of committed files. Write game paths starting from `_forever_/`.
+This repo is public. Keep game account names, character names, realm or server ids, home paths and machine details out of committed files. The GitHub owner name (WuphonsReach) is public and fine, for example as the `.toc` author. Write game paths starting from `_forever_/`.

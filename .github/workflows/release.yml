@@ -18,8 +18,20 @@ concurrency:
   cancel-in-progress: false
 
 jobs:
+  main-only:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Releases are made from main
+        env:
+          REF: ${{ github.ref }}
+        run: |
+          if [ "$REF" != "refs/heads/main" ]; then
+            echo "::error::Run the release workflow on main, not $REF"
+            exit 1
+          fi
+
   checks:
-    if: github.ref == 'refs/heads/main'
+    needs: main-only
     uses: ./.github/workflows/checks.yml
 
   release:
@@ -30,10 +42,13 @@ jobs:
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
+          persist-credentials: false
           fetch-depth: 0
       - name: Work out the version
         id: version
-        run: echo "version=$(python3 tools/next_version.py)" >> "$GITHUB_OUTPUT"
+        run: |
+          version=$(python3 tools/next_version.py)
+          echo "version=$version" >> "$GITHUB_OUTPUT"
       # Fails unless CHANGELOG.md's top section is headed with this version.
       - name: Release notes from CHANGELOG.md
         run: python3 tools/release_notes.py "${{ steps.version.outputs.version }}" > "$RUNNER_TEMP/notes.md"
