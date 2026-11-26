@@ -4,7 +4,7 @@ This file gives guidance to Claude Code (claude.ai/code) for work in this reposi
 
 ## What this is
 
-A one-file addon for WoW Forever (client 1.60.1, `## Interface: 16001`). It keeps the game's `rotateMinimap` setting (a console variable, or CVar) on. The Forever client resets the setting to 0 at login, just after `VARIABLES_LOADED`. The description for players is in [README.md](README.md).
+A one-file addon for WoW Forever (client 1.60.1, `## Interface: 16001`). It keeps the game's `rotateMinimap` setting (a console variable, or CVar) on. The Forever client resets the setting to 0 just after `VARIABLES_LOADED`, at every login, character switch and `/reload`. Loading screens don't reset it. The description for players is in [README.md](README.md).
 
 - The display name is Rotate Minimap (Forever). It is the `.toc` `## Title`, the README heading, and the CurseForge project title in the future.
 - The folder, the `.toc` file and the code keep the name `RotateMinimap`.
@@ -45,6 +45,7 @@ The addon's files are at the repo root, which is usual for a small repo with one
   - [make_icon.py](tools/make_icon.py) draws the icon SVGs. With `--render`, it also writes `icon.tga` and the CurseForge PNG.
   - [addon.py](tools/addon.py) holds the helpers that the other scripts share.
 - `local/`: a folder for local files, for example notes, logs and screenshots. Git ignores it, and luacheck skips it. Put files here that must not go into the public repo.
+  - `local/evidence/YYYY-MM-DD/` holds the redacted screenshots of a test day, a copy of the debug log, and a `README.md` that says what each shot shows.
 
 If the addon needs more than one folder in the future (a second addon, or folders for development only), do these steps:
 
@@ -131,7 +132,14 @@ Rules for the debug branch:
 - Never push it, and never open a PR from it. Make fixes on a new branch from `origin/main`, without the `DEBUG` lines.
 - After work on another branch, check out the debug branch again, because the game loads the checked-out branch. To edit a branch from `main` without a change of checkout, use a worktree in `local/`.
 - The client writes the saved variable to `_forever_/WTF/Account/<account>/SavedVariables/RotateMinimap.lua` only at logout, `/reload` or exit. Chat shows the current session. Do not write to `WTF/` while the game runs.
-- Screenshots show character names and the names of other players. Do not put them, or details from them, in committed files. Keep copies in `local/`.
+- Screenshots show character names and the names of other players. Do not put them, or details from them, in committed files.
+
+Screenshots of debug output (the user's shots are at the top of `~/Pictures/Screenshots/`):
+
+1. Find the shots that show the green `RotateMinimap` prefix (colour `33ff99`) in chat.
+2. Redact each one: keep only the debug lines in chat, with their wrapped lines, and the minimap, which shows whether the map turns. Make everything else black. A 4K shot drops from about 5 MB to about 300 KB.
+3. Look at every redacted shot before you replace an original. Keep the originals in a temporary backup until the user is satisfied.
+4. Move the redacted shots into `local/evidence/YYYY-MM-DD/`. Add a `README.md` that says, for each shot or group, what was tested and what it shows, and put a copy of the debug log next to it.
 
 ## Repo rules
 

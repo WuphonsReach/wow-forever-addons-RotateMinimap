@@ -57,7 +57,8 @@ Things to know about the link:
 4. Log in. Make sure that the minimap rotates with your facing. Do not type `/console rotateMinimap 1`.
 5. Go through a loading screen, for example an instance portal. Make sure that the minimap still rotates.
 6. Log out to character select and log in with a different character. Make sure that the minimap rotates. A character switch is the case that failed in 0.1.0.
-7. Log out and log in again. Make sure that the minimap rotates.
+7. Type `/reload`. Make sure that the minimap still rotates. A UI reload also resets the setting.
+8. Log out and log in again. Make sure that the minimap rotates.
 
 ## Run the checks
 
