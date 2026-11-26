@@ -1,0 +1,36 @@
+# PR checks. The job names are the status checks the pr-checks ruleset requires: renaming a job
+# means updating the ruleset in the same change, or every PR waits for a check that never reports.
+name: checks
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_call:
+
+permissions:
+  contents: read
+
+jobs:
+  luacheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: lunarmodules/luacheck@cc089e3f65acdd1ef8716cc73a3eca24a6b845e4 # v1.2.0
+
+  repo-checks:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0 # next_version.py reads the tags
+      - name: Tools compile
+        run: python3 -m py_compile tools/*.py
+      - name: version.yml and the .toc are valid
+        run: python3 tools/check_repo.py
+      - name: Next release version
+        run: python3 tools/next_version.py
+      - name: Release zip builds
+        run: |
+          python3 tools/build_zip.py 0.0.0-ci
+          unzip -l dist/RotateMinimap-0.0.0-ci.zip

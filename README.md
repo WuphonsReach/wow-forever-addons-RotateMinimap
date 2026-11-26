@@ -8,7 +8,7 @@ A tiny addon for WoW Forever (client 1.60.1, `## Interface: 16001`) that switche
 
 ## Install
 
-Copy the files into a folder named `RotateMinimap` in the game's `Interface/AddOns/` (`_forever_/Interface/AddOns/RotateMinimap/`). A new addon folder is found after a full restart, not `/reload`. It should then show in the AddOn List.
+Download the zip from the newest [release](https://github.com/WuphonsReach/wow-forever-addons-RotateMinimap/releases) and unzip it into the game's `Interface/AddOns/` (`_forever_/Interface/AddOns/`). It holds a `RotateMinimap` folder, which must sit directly in `AddOns/`. Or copy `RotateMinimap.toc` and `RotateMinimap.lua` into a folder named `RotateMinimap` there. A new addon folder is found after a full restart, not `/reload`. It should then show in the AddOn List.
 
 ## Settings
 
