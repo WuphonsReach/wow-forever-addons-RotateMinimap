@@ -15,7 +15,8 @@ The addon's files sit at the repo root, which is the usual layout for a small si
 - [RotateMinimap.toc](RotateMinimap.toc): the metadata and the file list. `## Interface: 16001` is Forever 1.60.1. When the client's interface number changes, update it here. Otherwise the addon shows as out of date. `## Version` stays `@project-version@` in the repo, and the release build fills in the real number. That's the BigWigs packager's token, so the packager can take over later without changes.
 - [RotateMinimap.lua](RotateMinimap.lua): one frame listens for `PLAYER_LOGIN` and `PLAYER_ENTERING_WORLD` and calls `SetCVar("rotateMinimap", ROTATE)` only when the value differs. It uses no SavedVariables and has no options UI. `ROTATE` is the only setting.
 - [version.yml](version.yml): the major and minor version of the next release (only `major: N` and `minor: N` lines).
-- `tools/`: Python with no dependencies. [check_repo.py](tools/check_repo.py) checks `version.yml` and the `.toc`. [next_version.py](tools/next_version.py) prints the next version. [build_zip.py](tools/build_zip.py) builds `dist/RotateMinimap-<version>.zip`. [addon.py](tools/addon.py) holds the helpers they share.
+- [CHANGELOG.md](CHANGELOG.md): one `## <version>` section per release, newest first, with `## Unreleased` at the top for changes not yet released. Add a line to it in every PR that changes the addon.
+- `tools/`: Python with no dependencies. [check_repo.py](tools/check_repo.py) checks `version.yml`, the `.toc` and the CHANGELOG headings. [next_version.py](tools/next_version.py) prints the next version. [release_notes.py](tools/release_notes.py) prints the top CHANGELOG section for a version. [build_zip.py](tools/build_zip.py) builds `dist/RotateMinimap-<version>.zip`. [addon.py](tools/addon.py) holds the helpers they share.
 
 If the addon ever needs more than one folder (a second addon, or dev-only folders), move it to `RotateMinimap/RotateMinimap.toc`, update `tools/addon.py`, and use `.pkgmeta` `move-folders`, as multi-addon Forever repos do.
 
@@ -24,7 +25,7 @@ If the addon ever needs more than one folder (a second addon, or dev-only folder
 ```bash
 export PATH="$HOME/.luarocks/bin:$PATH"
 luacheck .                          # lint; .luacheckrc lists every WoW global the addon may read
-python3 tools/check_repo.py         # version.yml parses; the .toc has its fields and lists every root .lua file
+python3 tools/check_repo.py         # version.yml parses; the .toc has its fields and lists every root .lua file; CHANGELOG headings in order
 python3 tools/next_version.py       # the version the next release would get
 python3 tools/build_zip.py 0.0.0-test && unzip -l dist/RotateMinimap-0.0.0-test.zip
 ```
@@ -39,17 +40,18 @@ Actions are pinned to full commit SHAs, with the version in a trailing comment, 
 
 ## Releasing
 
-[.github/workflows/release.yml](.github/workflows/release.yml) is started by hand from `main` (Actions > release > Run workflow, or `gh workflow run release.yml --ref main`). It runs the checks and computes the version: `major.minor` from `version.yml`, plus a patch number one past the highest `v<major>.<minor>.N` tag, or 0 if there is none. It then builds the zip and creates the tag `v<version>` and the GitHub release together, with notes generated from the merged PRs.
+[.github/workflows/release.yml](.github/workflows/release.yml) is started by hand from `main` (Actions > release > Run workflow, or `gh workflow run release.yml --ref main`). It runs the checks and computes the version: `major.minor` from `version.yml`, plus a patch number one past the highest `v<major>.<minor>.N` tag, or 0 if there is none. It then checks that CHANGELOG.md's top section is headed with that version, builds the zip, and creates the tag `v<version>` and the GitHub release together, with that CHANGELOG section as the notes.
 
-- For a patch release, merge the fix and run the workflow. For a bigger change, bump `minor` (or `major`, with `minor` back to 0) in `version.yml` in a PR first.
-- Tags and releases can't be changed once published. A bad release means a new version, not a fix in place.
-- The release zip has the `RotateMinimap/` folder at its top level, holding the `.toc`, the files it lists, and `LICENSE`. A wrapper folder would stop the addon loading.
+- To release: open a PR that renames `## Unreleased` to the version `python3 tools/next_version.py` prints (CI prints it too), merge it, then run the workflow. For a bigger change, bump `minor` (or `major`, with `minor` back to 0) in `version.yml` in the same PR.
+- `check_repo.py` accepts only `Unreleased`, the next version, or the latest tag (just released) as the top heading, so a wrong number fails on the PR, not at release time.
+- Tags (`version-tags` ruleset) and releases (the repo's immutable releases setting) can't be changed once published. A bad release means a new version, not a fix in place.
+- The release zip has the `RotateMinimap/` folder at its top level, holding the `.toc`, the files it lists, `LICENSE` and `CHANGELOG.md`. A wrapper folder would stop the addon loading.
 
 ### Moving to CurseForge later
 
 Most Forever addons on GitHub release with the [BigWigsMods packager](https://github.com/BigWigsMods/packager), which uploads to CurseForge and GitHub releases. To switch over:
 
-- Add a `.pkgmeta` with `package-as: RotateMinimap`, a `manual-changelog` pointing at `CHANGELOG.md` if one is added, and an `ignore` list for dev files (`.github`, `.pkgmeta`, `.luacheckrc`, `CLAUDE.md`, `tools`, `version.yml`).
+- Add a `.pkgmeta` with `package-as: RotateMinimap`, a `manual-changelog` pointing at `CHANGELOG.md` (the packager posts the whole file, so trim the GitHub release notes to one section as now), and an `ignore` list for dev files (`.github`, `.pkgmeta`, `.luacheckrc`, `CLAUDE.md`, `tools`, `version.yml`).
 - Add `## X-Curse-Project-ID: <id>` to the `.toc` after the project is created, and a `CF_API_KEY` repository secret.
 - In `release.yml`, keep the version and tag steps, push the tag, and replace the zip and release steps with the packager.
 

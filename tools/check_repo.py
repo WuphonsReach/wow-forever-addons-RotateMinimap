@@ -1,9 +1,46 @@
 """Repo checks that CI runs on every PR: version.yml parses, the .toc has the fields a release needs,
-and the files it lists match the .lua files in the repo root."""
+the files it lists match the .lua files in the repo root, and CHANGELOG.md's headings are in order."""
 
+import re
 import sys
 
-from addon import ROOT, TOC, VERSION_TOKEN, read_toc, read_version_file
+from addon import (CHANGELOG, ROOT, TOC, UNRELEASED, VERSION_RE, VERSION_TOKEN, next_version, read_changelog,
+                   read_toc, read_version_file, version_tags)
+
+
+def check_changelog():
+    """The top section is `Unreleased`, the next release's version, or the latest tag (just released);
+    the rest are released versions, newest first."""
+    if not CHANGELOG.is_file():
+        return ["CHANGELOG.md is missing"]
+    sections = read_changelog()
+    if not sections:
+        return ["CHANGELOG.md has no ## sections"]
+    try:
+        upcoming = next_version()
+    except ValueError:
+        return []  # version.yml is broken; reported above
+    tags = sorted(version_tags())
+    latest = ".".join(map(str, tags[-1])) if tags else None
+    errors = []
+    top = sections[0][0]
+    allowed = [UNRELEASED, upcoming] + ([latest] if latest else [])
+    if top not in allowed:
+        errors.append(f"CHANGELOG.md: top section '## {top}' should be one of: "
+                      + ", ".join(f"'## {a}'" for a in allowed))
+    versions = []
+    for i, (heading, body) in enumerate(sections):
+        if heading == UNRELEASED and i == 0:
+            continue
+        if not re.fullmatch(VERSION_RE, heading):
+            errors.append(f"CHANGELOG.md: '## {heading}' is not a version (or 'Unreleased' at the top)")
+            continue
+        if not body:
+            errors.append(f"CHANGELOG.md: '## {heading}' is empty")
+        versions.append(tuple(int(x) for x in heading.split(".")))
+    if versions != sorted(set(versions), reverse=True):
+        errors.append("CHANGELOG.md: versions should be unique and newest first")
+    return errors
 
 
 def main():
@@ -30,6 +67,8 @@ def main():
             errors.append(f"{path.name} is not listed in {TOC.name}, so the client won't load it")
     if not (ROOT / "LICENSE").is_file():
         errors.append("LICENSE is missing (it ships in the release zip)")
+
+    errors += check_changelog()
 
     for e in errors:
         print(f"error: {e}")

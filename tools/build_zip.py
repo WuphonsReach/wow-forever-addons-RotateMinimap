@@ -1,5 +1,5 @@
 """Build the release zip: dist/RotateMinimap-<version>.zip with the RotateMinimap/ folder at its top level,
-holding the .toc (with @project-version@ replaced by the version), the files it lists, and LICENSE.
+holding the .toc (with @project-version@ replaced by the version), the files it lists, LICENSE and CHANGELOG.md.
 
     python3 tools/build_zip.py 0.1.0
 """
@@ -23,7 +23,7 @@ def main():
     if VERSION_TOKEN not in toc_text:
         sys.exit(f"{TOC.name} has no {VERSION_TOKEN} to fill in")
     entries = {TOC.name: toc_text.replace(VERSION_TOKEN, version).encode("utf-8")}
-    for name in files + ["LICENSE"]:
+    for name in files + ["LICENSE", "CHANGELOG.md"]:
         entries[name] = (ROOT / name).read_bytes()
 
     dist = ROOT / "dist"

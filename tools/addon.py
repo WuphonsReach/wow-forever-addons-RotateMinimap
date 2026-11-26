@@ -1,12 +1,14 @@
 """Shared helpers for the repo tools: read version.yml and the .toc file."""
 
 import re
+import subprocess
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 ADDON = "RotateMinimap"
 TOC = ROOT / f"{ADDON}.toc"
 VERSION_FILE = ROOT / "version.yml"
+CHANGELOG = ROOT / "CHANGELOG.md"
 VERSION_TOKEN = "@project-version@"
 
 
@@ -27,6 +29,36 @@ def read_version_file():
     if missing:
         raise ValueError(f"version.yml: missing {', '.join(sorted(missing))}")
     return values["major"], values["minor"]
+
+
+VERSION_RE = r"(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)\.(0|[1-9][0-9]*)"
+UNRELEASED = "Unreleased"
+
+
+def version_tags():
+    """Return the existing release tags as (major, minor, patch) tuples."""
+    out = subprocess.run(
+        ["git", "tag", "--list", "v*"], cwd=ROOT, check=True, capture_output=True, text=True,
+    ).stdout.split()
+    return [tuple(int(g) for g in m.groups()) for t in out if (m := re.fullmatch("v" + VERSION_RE, t))]
+
+
+def next_version():
+    """major.minor from version.yml, patch one past the highest tag v<major>.<minor>.N (0 if none)."""
+    major, minor = read_version_file()
+    patches = [p for (a, b, p) in version_tags() if (a, b) == (major, minor)]
+    return f"{major}.{minor}.{max(patches) + 1 if patches else 0}"
+
+
+def read_changelog():
+    """Return the CHANGELOG.md sections as a list of (heading, body), in file order."""
+    sections = []
+    for line in CHANGELOG.read_text(encoding="utf-8").splitlines():
+        if line.startswith("## "):
+            sections.append((line[3:].strip(), []))
+        elif sections:
+            sections[-1][1].append(line)
+    return [(h, "\n".join(body).strip()) for h, body in sections]
 
 
 def read_toc():

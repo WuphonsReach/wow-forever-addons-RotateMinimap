@@ -1,6 +1,8 @@
 # Publish a GitHub release, started by hand (Actions > release > Run workflow, on main).
-# The version is major.minor from version.yml plus the next free patch number. The workflow runs the
-# checks, builds the zip, and creates the tag v<version> on the commit it ran on together with the release.
+# The version is major.minor from version.yml plus the next free patch number, and CHANGELOG.md's top
+# section must already be headed with it (rename '## Unreleased' in a PR first). The workflow runs the
+# checks, builds the zip, and creates the tag v<version> on the commit it ran on together with the release,
+# with that CHANGELOG section as the notes.
 # Tags v*.* are immutable (version-tags ruleset), so a bad release means a new version, not a fix in place.
 # Not uploaded to CurseForge yet.
 name: release
@@ -32,6 +34,9 @@ jobs:
       - name: Work out the version
         id: version
         run: echo "version=$(python3 tools/next_version.py)" >> "$GITHUB_OUTPUT"
+      # Fails unless CHANGELOG.md's top section is headed with this version.
+      - name: Release notes from CHANGELOG.md
+        run: python3 tools/release_notes.py "${{ steps.version.outputs.version }}" > "$RUNNER_TEMP/notes.md"
       - name: Build the zip
         run: python3 tools/build_zip.py "${{ steps.version.outputs.version }}"
       - name: Create the tag and release
@@ -42,4 +47,4 @@ jobs:
           gh release create "v$VERSION" "dist/RotateMinimap-$VERSION.zip" \
             --target "$GITHUB_SHA" \
             --title "RotateMinimap $VERSION" \
-            --generate-notes
+            --notes-file "$RUNNER_TEMP/notes.md"
