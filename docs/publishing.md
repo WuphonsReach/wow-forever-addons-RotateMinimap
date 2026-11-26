@@ -81,7 +81,8 @@ Most Forever addons on GitHub use the [BigWigsMods packager](https://github.com/
    - Examine the slug that CurseForge gives (probably `rotate-minimap-forever`). It becomes part of the project's address.
    - Write down the project id from the project page.
 2. In the CurseForge author settings, create an API token.
-3. Store the token as the repository secret `CF_API_KEY` (GitHub repo > Settings > Secrets and variables > Actions).
+3. Store the token as the repository secret `CF_API_TOKEN` (GitHub repo > Settings > Secrets and variables > Actions).
+   - The packager reads the token from the environment variable `CF_API_TOKEN`. Older guides use the name `CF_API_KEY`. The packager changed its token names in v2.6.0.
 4. In a PR, add `## X-Curse-Project-ID: <id>` to `RotateMinimap.toc`.
 5. In the same PR, add a `.pkgmeta` file:
    - `package-as: RotateMinimap`.
@@ -98,6 +99,8 @@ Most Forever addons on GitHub use the [BigWigsMods packager](https://github.com/
 6. In the same PR, change `release.yml`:
    - Keep the `decide` and `checks` jobs.
    - In the release job, push the tag, then run the packager. The packager replaces the zip step and the `gh release create` step.
+   - Use packager v2.7.0 or later. v2.6.0 added Forever, and v2.7.0 accepts a Forever interface number in a `.toc` with no suffix, as ours is. Pin the commit SHA, as the other actions are pinned. v2.7.0 is `01e8631a69c69d7654c788d152630d5fed9e3812`.
+   - The packager finds `## Interface: 16001` in the `.toc` and tags the file for the Forever flavor (game version 1.60.1) on CurseForge. It needs no other setting.
    - The packager puts the full CHANGELOG on CurseForge. Keep the GitHub release notes to one section, as now.
 
 The release PR process does not change. After the change, a merged release PR publishes to GitHub and to CurseForge.

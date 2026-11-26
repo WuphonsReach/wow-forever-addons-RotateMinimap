@@ -2,7 +2,7 @@
 
 Add new entries under `## Unreleased` at the top. To release, rename that heading to the next version in a PR. `python3 tools/next_version.py` prints the next version, and CI prints it too. The merge publishes the release, with that section as the release notes. See [docs/publishing.md](docs/publishing.md).
 
-## Unreleased
+## 0.1.2
 
 - The addon now has an icon in the AddOn List: a compass face with the player arrow pointing up and the N turned away from the top.
 

@@ -107,7 +107,7 @@ Safeguards:
   - `LICENSE`.
   - `CHANGELOG.md`.
 
-A move to CurseForge is planned (the BigWigs packager, `CF_API_KEY`, `## X-Curse-Project-ID`). The steps are in docs/publishing.md, "CurseForge, later".
+A move to CurseForge is planned (BigWigs packager v2.7.0 or later, the `CF_API_TOKEN` secret, `## X-Curse-Project-ID`). The steps are in docs/publishing.md, "CurseForge, later".
 
 ## Testing in game
 
