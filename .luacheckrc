@@ -5,6 +5,7 @@ max_line_length = false
 exclude_files = { ".luacheckrc", ".luarocks", "dist", "local" }
 
 read_globals = {
+  "C_Timer",
   "CreateFrame",
   "GetCVar",
   "SetCVar",
