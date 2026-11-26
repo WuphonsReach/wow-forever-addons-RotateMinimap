@@ -25,7 +25,7 @@ The addon's files are at the repo root, which is usual for a small repo with one
   - `## Version` stays `@project-version@` in the repo. The release build writes the real number. This is the token of the BigWigs packager, so the packager can replace the build later with no changes.
 - [RotateMinimap.lua](RotateMinimap.lua): one frame listens for `PLAYER_LOGIN`, `PLAYER_ENTERING_WORLD` and `CVAR_UPDATE` (for `rotateMinimap` only). It calls `SetCVar("rotateMinimap", ROTATE)` only when the value is different. It uses no SavedVariables and has no options UI. `ROTATE` is the only setting.
   - `CVAR_UPDATE` does the real work. `VARIABLES_LOADED`, and the reset after it, can come after `PLAYER_LOGIN` and `PLAYER_ENTERING_WORLD`, for example after a character switch.
-  - To find out when the client changes a setting, log each event and the value to chat and to a SavedVariables table. Remove the logging before a release.
+  - To find out when the client changes a setting, use the debug branch (see "Debug branch" below).
 - [icon.tga](icon.tga): the icon in the AddOn List. `## IconTexture` in the `.toc` names it.
   - It is a 64×64, 32-bit, uncompressed TGA with the rows stored from the bottom, as the other Forever addons use.
   - Do not edit the icon files by hand. Change [make_icon.py](tools/make_icon.py), then run `python3 tools/make_icon.py --render`. This needs `rsvg-convert` and ImageMagick 7 (`magick`).
@@ -116,6 +116,22 @@ The steps for people are in [docs/development.md](docs/development.md). Keep tha
 - A change to the `.lua` file shows after `/reload`. A change to the `.toc` needs a full restart.
 - To check: the addon shows in the AddOn List at character select, with "Load out of date AddOns" cleared. After login, the minimap rotates with no `/console rotateMinimap 1`.
 - Files from the repo show `@project-version@` as their version. This is harmless.
+
+### Debug branch
+
+The user tests on a local branch with debug logging, for example `2026-11-26-debug-logging`. It is `main` plus `DEBUG` lines in three files:
+
+- `RotateMinimap.lua` logs each event and the value of `rotateMinimap` to chat and to the saved variable `RotateMinimapDebugLog`. After each change of the value, it reads the value again 5 seconds later.
+- `RotateMinimap.toc` adds `## SavedVariables: RotateMinimapDebugLog`.
+- `.luacheckrc` adds the globals that the logging uses.
+
+Rules for the debug branch:
+
+- Keep it up to date: merge `origin/main` into it. Resolve conflicts so that the logging wraps the logic of `main`, with no other changes.
+- Never push it, and never open a PR from it. Make fixes on a new branch from `origin/main`, without the `DEBUG` lines.
+- After work on another branch, check out the debug branch again, because the game loads the checked-out branch. To edit a branch from `main` without a change of checkout, use a worktree in `local/`.
+- The client writes the saved variable to `_forever_/WTF/Account/<account>/SavedVariables/RotateMinimap.lua` only at logout, `/reload` or exit. Chat shows the current session. Do not write to `WTF/` while the game runs.
+- Screenshots show character names and the names of other players. Do not put them, or details from them, in committed files. Keep copies in `local/`.
 
 ## Repo rules
 
