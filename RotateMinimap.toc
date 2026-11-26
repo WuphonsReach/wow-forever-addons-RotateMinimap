@@ -1,8 +1,8 @@
 ## Interface: 16001
-## Title: Rotate Minimap
+## Title: Rotate Minimap (Forever)
 ## Notes: Keeps the minimap rotating with your facing (the rotateMinimap setting), which the Forever client resets at login.
-## Author: local (this repo)
-## Version: 0.1.0
+## Author: WuphonsReach
+## Version: @project-version@
 ## X-License: MIT
 
 RotateMinimap.lua
