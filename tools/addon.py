@@ -72,6 +72,21 @@ def read_changelog(text=None):
     return [(h, "\n".join(body).strip()) for h, body in sections]
 
 
+ICON_PREFIX = f"Interface/AddOns/{ADDON}/"
+
+
+def icon_file(fields):
+    """The repo-relative file that `## IconTexture` names, or None if the .toc has no icon.
+    Raises ValueError if the path is not inside this addon's folder."""
+    value = fields.get("IconTexture")
+    if not value:
+        return None
+    path = value.replace("\\", "/")
+    if not path.lower().startswith(ICON_PREFIX.lower()):
+        raise ValueError(f"## IconTexture should start with {ICON_PREFIX.replace('/', chr(92))}, got {value!r}")
+    return path[len(ICON_PREFIX):]
+
+
 def read_toc():
     """Return (fields, files): the `## Key: value` fields and the listed file names, in order."""
     fields, files = {}, []

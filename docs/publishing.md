@@ -40,6 +40,7 @@ If there is no `## Unreleased` section (for example, right after a release), add
    - The folder holds these files:
      - `RotateMinimap.toc`
      - `RotateMinimap.lua`
+     - `icon.tga`
      - `LICENSE`
      - `CHANGELOG.md`
    - The `.toc` file reads `## Version: <version>`.
@@ -91,6 +92,7 @@ Most Forever addons on GitHub use the [BigWigsMods packager](https://github.com/
      - `.luacheckrc`
      - `CLAUDE.md`
      - `docs`
+     - `media`
      - `tools`
      - `version.yml`
 6. In the same PR, change `release.yml`:

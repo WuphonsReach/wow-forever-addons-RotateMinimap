@@ -1,11 +1,12 @@
 """Repo checks that CI runs on every PR: version.yml parses, the .toc has the fields a release needs,
-the files it lists match the .lua files in the repo root, and CHANGELOG.md's headings are in order."""
+the files it lists match the .lua files in the repo root, the IconTexture file exists, and CHANGELOG.md's
+headings are in order."""
 
 import re
 import sys
 
-from addon import (CHANGELOG, ROOT, TOC, UNRELEASED, VERSION_RE, VERSION_TOKEN, changelog_at_tag, next_version,
-                   read_changelog, read_toc, read_version_file, version_tags)
+from addon import (CHANGELOG, ROOT, TOC, UNRELEASED, VERSION_RE, VERSION_TOKEN, changelog_at_tag, icon_file,
+                   next_version, read_changelog, read_toc, read_version_file, version_tags)
 
 
 def check_changelog():
@@ -72,6 +73,15 @@ def main():
     for path in sorted(ROOT.glob("*.lua")):
         if path.name not in files:
             errors.append(f"{path.name} is not listed in {TOC.name}, so the client won't load it")
+    try:
+        icon = icon_file(fields)
+    except ValueError as e:
+        errors.append(f"{TOC.name}: {e}")
+    else:
+        if icon and not (ROOT / icon).is_file():
+            errors.append(f"{TOC.name}: ## IconTexture names {icon}, which does not exist")
+        elif icon and not icon.lower().endswith((".tga", ".blp")):
+            errors.append(f"{TOC.name}: ## IconTexture should name a .tga or .blp file, got {icon}")
     if not (ROOT / "LICENSE").is_file():
         errors.append("LICENSE is missing (it ships in the release zip)")
 
