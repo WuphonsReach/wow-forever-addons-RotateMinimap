@@ -2,7 +2,7 @@
 
 Add new entries under `## Unreleased` at the top. To release, rename that heading to the next version in a PR. `python3 tools/next_version.py` prints the next version, and CI prints it too. The merge publishes the release, with that section as the release notes. See [docs/publishing.md](docs/publishing.md).
 
-## Unreleased
+## 0.1.1
 
 - Fix: the minimap stayed fixed with north at the top after a character switch, until the next loading screen. The client resets the setting after the addon sets it at login, so the addon now sets it again when the client changes it.
 
