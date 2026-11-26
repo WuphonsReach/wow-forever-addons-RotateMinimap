@@ -1,21 +1,30 @@
 # Rotate Minimap (Forever)
 
-A tiny addon for WoW Forever (client 1.60.1, `## Interface: 16001`) that switches the `rotateMinimap` game setting on at login and after loading screens, so the minimap turns with your facing instead of keeping North at the top.
+This addon makes the minimap turn with your facing, instead of keeping north at the top. It is for WoW Forever (client 1.60.1) only.
 
-It is for WoW Forever only. Other WoW versions have a "Rotate Minimap" checkbox in their interface options, so they don't need it. Forever has the setting but no checkbox for it.
-
-## Why
-
-`/console rotateMinimap 1` works for the session, but on the Forever client the setting was gone from `config-cache.wtf` after the next login (checked 2026-11-25). The client resets it, and no other addon or OneForAll option sets it. This addon sets it again each time.
+The game has a `rotateMinimap` setting, but the Forever client resets it at login. The addon sets it again at login and after every loading screen.
 
 ## Install
 
-Download the zip from the newest [release](https://github.com/WuphonsReach/wow-forever-addons-RotateMinimap/releases) and unzip it into the game's `Interface/AddOns/` (`_forever_/Interface/AddOns/`). It holds a `RotateMinimap` folder, which must sit directly in `AddOns/`. Or copy `RotateMinimap.toc` and `RotateMinimap.lua` into a folder named `RotateMinimap` there. A new addon folder is found after a full restart, not `/reload`. It should then show in the AddOn List.
+1. Download the zip from the newest [release](https://github.com/WuphonsReach/wow-forever-addons-RotateMinimap/releases).
+2. Unzip it into `_forever_/Interface/AddOns/`. The zip holds a `RotateMinimap` folder, and that folder must be directly in `AddOns/`.
+3. Close the game and start it again. The game finds a new addon folder only after a full restart, not after `/reload`.
+4. At character select, open the AddOn List and make sure that Rotate Minimap (Forever) is in the list and on.
+
+You can also install from the repo. Make a folder named `RotateMinimap` in `AddOns/`, and copy `RotateMinimap.toc` and `RotateMinimap.lua` into it.
 
 ## Settings
 
-None. To turn rotation off, change `ROTATE` to `"0"` in `RotateMinimap.lua`. It uses no SavedVariables.
+The addon has no options and saves no data. To stop the rotation, change `ROTATE` to `"0"` in `RotateMinimap.lua`.
+
+## Other WoW versions
+
+Other WoW versions have a "Rotate Minimap" checkbox in their interface options, so they do not need this addon. Forever has the setting but no checkbox.
+
+## Why the addon is necessary
+
+The command `/console rotateMinimap 1` turns rotation on, but only until you log out. After the next login, the setting is gone from `config-cache.wtf`. No other addon or OneForAll option sets it again. This was found on 2026-11-25.
 
 ## License
 
-MIT, see `LICENSE`.
+MIT. See [LICENSE](LICENSE).
