@@ -97,16 +97,12 @@ A move to CurseForge is planned (the BigWigs packager, `CF_API_KEY`, `## X-Curse
 
 ## Testing in game
 
-1. Copy `RotateMinimap.toc` and `RotateMinimap.lua` into `_forever_/Interface/AddOns/RotateMinimap/` in the game install. Or unzip a release zip into `AddOns/`.
-2. Fully restart the client if the folder is new. The client finds a new addon folder only after a full restart, not after `/reload`.
-3. At character select, make sure that the addon shows in the AddOn List with "Load out of date AddOns" cleared.
-4. Log in. Make sure that the minimap rotates with no `/console rotateMinimap 1`.
+The steps for people are in [docs/development.md](docs/development.md). Keep that file in step with this section.
 
-Notes:
-
-- A copy straight from the repo shows `@project-version@` as its version. This is harmless.
-- The installed copy is a plain copy, not a link. Copy it again after every change.
+- In the user's game install, `_forever_/Interface/AddOns/RotateMinimap` is a link to the repo root. The game loads the files of the checked-out branch, so there is no copy step after a change.
 - A change to the `.lua` file shows after `/reload`. A change to the `.toc` needs a full restart.
+- To check: the addon shows in the AddOn List at character select, with "Load out of date AddOns" cleared. After login, the minimap rotates with no `/console rotateMinimap 1`.
+- Files from the repo show `@project-version@` as their version. This is harmless.
 
 ## Repo rules
 
