@@ -1,3 +1,5 @@
 dist/
 __pycache__/
 local/
+media/concepts/out/
+media/concepts/glyphs*.json

@@ -26,14 +26,23 @@ The addon's files are at the repo root, which is usual for a small repo with one
 - [RotateMinimap.lua](RotateMinimap.lua): one frame listens for `PLAYER_LOGIN`, `PLAYER_ENTERING_WORLD` and `CVAR_UPDATE` (for `rotateMinimap` only). It calls `SetCVar("rotateMinimap", ROTATE)` only when the value is different. It uses no SavedVariables and has no options UI. `ROTATE` is the only setting.
   - `CVAR_UPDATE` does the real work. `VARIABLES_LOADED`, and the reset after it, can come after `PLAYER_LOGIN` and `PLAYER_ENTERING_WORLD`, for example after a character switch.
   - To find out when the client changes a setting, log each event and the value to chat and to a SavedVariables table. Remove the logging before a release.
+- [icon.tga](icon.tga): the icon in the AddOn List. `## IconTexture` in the `.toc` names it.
+  - It is a 64×64, 32-bit, uncompressed TGA with the rows stored from the bottom, as the other Forever addons use.
+  - Do not edit the icon files by hand. Change [make_icon.py](tools/make_icon.py), then run `python3 tools/make_icon.py --render`. This needs `rsvg-convert` and ImageMagick 7 (`magick`).
+- `media/`: the icon files that `make_icon.py` writes. They are not in the release zip.
+  - [icon.svg](media/icon.svg): the source of `icon.tga`.
+  - [icon-curseforge.svg](media/icon-curseforge.svg) and [icon-curseforge-400.png](media/icon-curseforge-400.png): the detailed version, for the CurseForge project avatar and the README.
+  - The N is a letter from the Grenze typeface (SIL Open Font License), stored in `make_icon.py` as a path. The SVGs need no font file.
+  - [concepts/](media/concepts/README.md): the scripts that drew the earlier icon options. They are for reference only.
 - [version.yml](version.yml): the major and minor version of the next release. It has only `major: N` and `minor: N` lines.
 - [CHANGELOG.md](CHANGELOG.md): one `## <version>` section for each release, newest first. A `## Unreleased` section at the top holds changes that are not released yet. Every PR that changes the addon adds a line to it.
-- `tools/`: Python scripts with no dependencies.
-  - [check_repo.py](tools/check_repo.py) checks `version.yml`, the `.toc` and the CHANGELOG headings.
+- `tools/`: Python scripts that need no Python packages. Only `make_icon.py --render` needs other programs.
+  - [check_repo.py](tools/check_repo.py) checks `version.yml`, the `.toc` (and its icon file) and the CHANGELOG headings.
   - [next_version.py](tools/next_version.py) prints the next version.
   - [release_notes.py](tools/release_notes.py) prints the top CHANGELOG section for a version.
   - [release_due.py](tools/release_due.py) tells if a release is due.
   - [build_zip.py](tools/build_zip.py) builds `dist/RotateMinimap-<version>.zip`.
+  - [make_icon.py](tools/make_icon.py) draws the icon SVGs. With `--render`, it also writes `icon.tga` and the CurseForge PNG.
   - [addon.py](tools/addon.py) holds the helpers that the other scripts share.
 - `local/`: a folder for local files, for example notes, logs and screenshots. Git ignores it, and luacheck skips it. Put files here that must not go into the public repo.
 
@@ -93,6 +102,7 @@ Safeguards:
 - The release zip has the `RotateMinimap/` folder at its top level. A wrapper folder around it stops the addon from loading. The folder holds:
   - The `.toc`.
   - The files that the `.toc` lists.
+  - The `## IconTexture` file (`icon.tga`).
   - `LICENSE`.
   - `CHANGELOG.md`.
 
