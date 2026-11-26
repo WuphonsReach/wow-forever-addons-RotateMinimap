@@ -1,6 +1,6 @@
 # Changelog
 
-New entries go under `## Unreleased` at the top. To release, rename that heading to the version the release will get (`python3 tools/next_version.py`, also printed by CI); the release workflow uses that section as the release notes.
+New entries go under `## Unreleased` at the top. A PR that renames that heading to the next version (`python3 tools/next_version.py`, also printed by CI) publishes the release when merged, with that section as the release notes. See [docs/publishing.md](docs/publishing.md).
 
 ## 0.1.0
 

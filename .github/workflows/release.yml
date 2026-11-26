@@ -1,13 +1,18 @@
-# Publish a GitHub release, started by hand (Actions > release > Run workflow, on main).
-# The version is major.minor from version.yml plus the next free patch number, and CHANGELOG.md's top
-# section must already be headed with it (rename '## Unreleased' in a PR first). The workflow runs the
-# checks, builds the zip, and creates the tag v<version> on the commit it ran on together with the release,
-# with that CHANGELOG section as the notes.
-# Tags v*.* are immutable (version-tags ruleset), so a bad release means a new version, not a fix in place.
+# Publish a GitHub release when a release PR is merged. The steps for people are in docs/publishing.md.
+#
+# Runs on every push to main, and by hand (Actions > release > Run workflow, on main) as a fallback.
+# A release is due when CHANGELOG.md's top section is headed with the next version: major.minor from
+# version.yml plus the next free patch number. A push where it isn't (top is '## Unreleased', or the
+# version already released) finishes green without releasing; a manual run in that state fails.
+# The release job runs the checks, builds the zip, and creates the tag v<version> on the pushed commit
+# together with the release, with that CHANGELOG section as the notes.
+# Tags v*.* and releases are immutable, so a bad release means a new version, not a fix in place.
 # Not uploaded to CurseForge yet.
 name: release
 
 on:
+  push:
+    branches: [main]
   workflow_dispatch:
 
 permissions:
@@ -17,9 +22,16 @@ concurrency:
   group: release
   cancel-in-progress: false
 
+defaults:
+  run:
+    shell: bash # adds pipefail, so a failing script before `| tee` fails the step
+
 jobs:
-  main-only:
+  decide:
     runs-on: ubuntu-latest
+    outputs:
+      due: ${{ steps.due.outputs.due }}
+      version: ${{ steps.due.outputs.version }}
     steps:
       - name: Releases are made from main
         env:
@@ -29,37 +41,59 @@ jobs:
             echo "::error::Run the release workflow on main, not $REF"
             exit 1
           fi
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+          fetch-depth: 0 # next_version.py reads the tags
+      - name: Is a release due?
+        id: due
+        run: python3 tools/release_due.py | tee -a "$GITHUB_OUTPUT"
+      - name: Nothing to release
+        if: steps.due.outputs.due != 'true'
+        env:
+          EVENT: ${{ github.event_name }}
+          REASON: ${{ steps.due.outputs.reason }}
+        run: |
+          if [ "$EVENT" = "workflow_dispatch" ]; then
+            echo "::error::No release: $REASON. See docs/publishing.md."
+            exit 1
+          fi
+          echo "::notice::No release: $REASON."
 
   checks:
-    needs: main-only
+    needs: decide
+    if: needs.decide.outputs.due == 'true'
     uses: ./.github/workflows/checks.yml
 
   release:
-    needs: checks
+    needs: [decide, checks]
     runs-on: ubuntu-latest
     permissions:
       contents: write
+    env:
+      VERSION: ${{ needs.decide.outputs.version }}
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
           persist-credentials: false
           fetch-depth: 0
-      - name: Work out the version
-        id: version
+      - name: The version is still free
         run: |
-          version=$(python3 tools/next_version.py)
-          echo "version=$version" >> "$GITHUB_OUTPUT"
+          now=$(python3 tools/next_version.py)
+          if [ "$now" != "$VERSION" ]; then
+            echo "::error::Next version is now $now, not $VERSION (a tag appeared since the decide job)"
+            exit 1
+          fi
       # Fails unless CHANGELOG.md's top section is headed with this version.
       - name: Release notes from CHANGELOG.md
-        run: python3 tools/release_notes.py "${{ steps.version.outputs.version }}" > "$RUNNER_TEMP/notes.md"
+        run: python3 tools/release_notes.py "$VERSION" > "$RUNNER_TEMP/notes.md"
       - name: Build the zip
-        run: python3 tools/build_zip.py "${{ steps.version.outputs.version }}"
+        run: python3 tools/build_zip.py "$VERSION"
       - name: Create the tag and release
         env:
           GH_TOKEN: ${{ github.token }}
-          VERSION: ${{ steps.version.outputs.version }}
         run: |
           gh release create "v$VERSION" "dist/RotateMinimap-$VERSION.zip" \
             --target "$GITHUB_SHA" \
-            --title "RotateMinimap $VERSION" \
+            --title "Rotate Minimap (Forever) $VERSION" \
             --notes-file "$RUNNER_TEMP/notes.md"
