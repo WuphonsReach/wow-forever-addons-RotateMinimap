@@ -6,6 +6,15 @@ This addon makes the minimap turn with your facing, instead of keeping north at 
 
 The game has a `rotateMinimap` setting, but the Forever client resets it at every login and `/reload`. The addon turns the setting on again after each reset.
 
+## Before and after
+
+Both pictures show the same place, with the player facing west. The left picture is without the addon, and the right picture is with it.
+
+<img src="media/minimap-before-after.png" alt="Two minimaps side by side. Left, without the addon: the north marker is at the top of the rim, and the player arrow points left. Right, with the addon: the player arrow points up, the map is turned, and the north marker is on the right of the rim." width="471">
+
+- Without the addon, the map stays fixed with north at the top, and the player arrow turns. The small triangle on the rim marks north.
+- With the addon, the player arrow always points up, and the map turns around it. Here the north marker is on the right, because the player faces west.
+
 ## Install
 
 1. Download the zip from the newest [release](https://github.com/WuphonsReach/wow-forever-addons-RotateMinimap/releases).
