@@ -2,4 +2,4 @@
 # one more than the highest existing tag v<major>.<minor>.N, or 0 if there is none.
 # Bump minor (or major, resetting minor to 0) in a PR before releasing a bigger change.
 major: 0
-minor: 1
+minor: 2
