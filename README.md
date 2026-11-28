@@ -4,7 +4,7 @@
 
 This addon makes the minimap turn with your facing, instead of keeping north at the top. It is for WoW Forever (client 1.60.1) only.
 
-The game has a `rotateMinimap` setting, but the Forever client resets it at login. The addon sets it again each time the client resets it, and also at login and after every loading screen.
+The game has a `rotateMinimap` setting, but the Forever client resets it at every login and `/reload`. The addon turns the setting on again after each reset.
 
 ## Install
 
@@ -17,7 +17,10 @@ You can also install from the repo. Make a folder named `RotateMinimap` in `AddO
 
 ## Settings
 
-The addon has no options and saves no data. To stop the rotation, change `ROTATE` to `"0"` in `RotateMinimap.lua`.
+The addon has no options and saves no data.
+
+- To stop the rotation for the rest of the session, type `/console rotateMinimap 0`. The addon leaves your change alone until the next login or `/reload`.
+- To stop it for good, turn the addon off in the AddOn List.
 
 ## Other WoW versions
 

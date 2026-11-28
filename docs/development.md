@@ -59,6 +59,8 @@ Things to know about the link:
 6. Log out to character select and log in with a different character. Make sure that the minimap rotates. A character switch is the case that failed in 0.1.0.
 7. Type `/reload`. Make sure that the minimap still rotates. A UI reload also resets the setting.
 8. Log out and log in again. Make sure that the minimap rotates.
+9. Wait 10 seconds after login, then type `/console rotateMinimap 0`. Make sure that the minimap stops rotating and stays north-up, also after a loading screen. The addon must not set the player's change back.
+10. Type `/reload`. Make sure that the minimap rotates again.
 
 ## Run the checks
 

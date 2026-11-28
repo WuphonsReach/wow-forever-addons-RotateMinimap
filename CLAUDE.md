@@ -23,8 +23,10 @@ The addon's files are at the repo root, which is usual for a small repo with one
 - [RotateMinimap.toc](RotateMinimap.toc): the metadata and the file list.
   - `## Interface: 16001` is Forever 1.60.1. When the client's interface number changes, update it here. If you do not, the addon shows as out of date.
   - `## Version` stays `@project-version@` in the repo. The release build writes the real number. This is the token of the BigWigs packager, so the packager can replace the build later with no changes.
-- [RotateMinimap.lua](RotateMinimap.lua): one frame listens for `PLAYER_LOGIN`, `PLAYER_ENTERING_WORLD` and `CVAR_UPDATE` (for `rotateMinimap` only). It calls `SetCVar("rotateMinimap", ROTATE)` only when the value is different. It uses no SavedVariables and has no options UI. `ROTATE` is the only setting.
+- [RotateMinimap.lua](RotateMinimap.lua): one frame listens for `PLAYER_LOGIN`, `VARIABLES_LOADED` and `CVAR_UPDATE` (for `rotateMinimap` only). It calls `SetCVar("rotateMinimap", ROTATE)` only when the value is different. It uses no SavedVariables and has no options UI. `ROTATE` is the only setting.
   - `CVAR_UPDATE` does the real work. `VARIABLES_LOADED`, and the reset after it, can come after `PLAYER_LOGIN` and `PLAYER_ENTERING_WORLD`, for example after a character switch.
+  - The addon sets changes back only until `GUARD` seconds (10) after `VARIABLES_LOADED`. A later change comes from the player, for example `/console rotateMinimap 0` or a Rotate Minimap option in a future client, and the addon keeps it until the next login or `/reload`. Do not make the addon fight the player's choice.
+  - Loading screens don't reset the setting, so the addon does nothing at `PLAYER_ENTERING_WORLD`.
   - To find out when the client changes a setting, use the debug branch (see "Debug branch" below).
 - [icon.tga](icon.tga): the icon in the AddOn List. `## IconTexture` in the `.toc` names it.
   - It is a 64×64, 32-bit, uncompressed TGA with the rows stored from the bottom, as the other Forever addons use.
@@ -115,7 +117,7 @@ The steps for people are in [docs/development.md](docs/development.md). Keep tha
 
 - In the user's game install, `_forever_/Interface/AddOns/RotateMinimap` is a link to the repo root. The game loads the files of the checked-out branch, so there is no copy step after a change.
 - A change to the `.lua` file shows after `/reload`. A change to the `.toc` needs a full restart.
-- To check: the addon shows in the AddOn List at character select, with "Load out of date AddOns" cleared. After login, the minimap rotates with no `/console rotateMinimap 1`.
+- To check: the addon shows in the AddOn List at character select, with "Load out of date AddOns" cleared. After login, the minimap rotates with no `/console rotateMinimap 1`. After `/console rotateMinimap 0`, it stays north-up until the next login or `/reload`.
 - Files from the repo show `@project-version@` as their version. This is harmless.
 
 ### Debug branch
