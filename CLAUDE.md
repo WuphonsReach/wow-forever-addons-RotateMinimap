@@ -31,7 +31,8 @@ The addon's files are at the repo root, which is usual for a small repo with one
 - [icon.tga](icon.tga): the icon in the AddOn List. `## IconTexture` in the `.toc` names it.
   - It is a 64×64, 32-bit, uncompressed TGA with the rows stored from the bottom, as the other Forever addons use.
   - Do not edit the icon files by hand. Change [make_icon.py](tools/make_icon.py), then run `python3 tools/make_icon.py --render`. This needs `rsvg-convert` and ImageMagick 7 (`magick`).
-- `media/`: the icon files that `make_icon.py` writes. They are not in the release zip.
+- `media/`: the icon files that `make_icon.py` writes, and the README pictures. They are not in the release zip.
+  - [minimap-before-after.png](media/minimap-before-after.png): the before and after picture in the README, two crops with a bronze divider between them. The crops come from the top-right corner of the user's in-game screenshots: the minimap, the zone name and the clock. They show no chat and no player names. A new picture from a screenshot must leave those out too.
   - [icon.svg](media/icon.svg): the source of `icon.tga`.
   - [icon-curseforge.svg](media/icon-curseforge.svg) and [icon-curseforge-400.png](media/icon-curseforge-400.png): the detailed version, for the CurseForge project avatar and the README.
   - The N is a letter from the Grenze typeface (SIL Open Font License), stored in `make_icon.py` as a path. The SVGs need no font file.
